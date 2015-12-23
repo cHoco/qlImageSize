@@ -33,11 +33,6 @@ OSStatus GenerateThumbnailForURL(__unused void* thisInterface, QLThumbnailReques
 			extension = ([(__bridge NSURL*)url pathExtension] != nil) ? [(__bridge NSURL*)url pathExtension] : @"";
 		extension = [extension lowercaseString];
 
-		// Create the properties dic
-		CFTypeRef keys[1] = {kQLThumbnailPropertyExtensionKey};
-		CFTypeRef values[1] = {(__bridge CFStringRef)extension};
-		CFDictionaryRef properties = CFDictionaryCreate(kCFAllocatorDefault, (const void**)keys, (const void**)values, 1, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-
 		// Check by extension because it's highly unprobable that an UTI for these formats is declared
 		// the simplest way to declare one is creating a dummy automator app and adding imported/exported UTI conforming to public.image
 		if ([extension isEqualToString:@"webp"] || [extension isEqualToString:@"pgm"] || [extension isEqualToString:@"ppm"] || [extension isEqualToString:@"pbm"] || [extension isEqualToString:@"bpg"])
@@ -59,20 +54,17 @@ OSStatus GenerateThumbnailForURL(__unused void* thisInterface, QLThumbnailReques
 				// 2. render it
 				if (img_ref != NULL)
 				{
-					QLThumbnailRequestSetImage(thumbnail, img_ref, properties);
+					QLThumbnailRequestSetImage(thumbnail, img_ref, NULL);
 					CGImageRelease(img_ref);
 				}
 				else
-					QLThumbnailRequestSetImageAtURL(thumbnail, url, properties);
+					QLThumbnailRequestSetImageAtURL(thumbnail, url, NULL);
 			}
 			else
-				QLThumbnailRequestSetImageAtURL(thumbnail, url, properties);
+				QLThumbnailRequestSetImageAtURL(thumbnail, url, NULL);
 		}
 		else
-			QLThumbnailRequestSetImageAtURL(thumbnail, url, properties);
-
-		if (properties != NULL)
-			CFRelease(properties);
+			QLThumbnailRequestSetImageAtURL(thumbnail, url, NULL);
 	}
 	return kQLReturnNoError;
 }
